@@ -72,35 +72,37 @@ Quote source text directly in each field below. Paraphrase does not satisfy them
 
 **Run history**
 
-[The agreement score of each run you did, in order. A single run is a complete answer if
-only one run occurred. **The last score in your list must match the agreement line in the
-`eval-run.txt` you committed** — that file is the record of your final run.]
+15/20
+4/5
+1/1
+17/20
+5/7
+7/7
+20/20
 
 **Issue analysis**
 
-[One scored issue, identified by id (`issue-01` through `issue-20`; the `calib-`
-issues are not scored). State your rubric's decision, the gold label, and the
-reasoning that produced your rubric's result.]
+issue-15 — My rubric's decision was reject, and the gold label was reject. The issue looked approachable because it had a good first issue label, but its history showed prolonged discussion, multiple contributors attempting it, and abandoned or closed implementation attempts. I updated the Scope fits check so that this history counts as evidence that an apparently simple issue may actually have unresolved scope.
 
 **Check rationale**
 
-[One check from the `rubric.md` uploaded to `tools/issue-select/`, quoted as it is
-currently written, with the reasoning behind its current form.]
+Scope fits — "Pass when the issue identifies one coherent outcome or concrete bug and provides enough information or maintainer-curated scope signals for a contributor to begin investigating or implementing it."
+
+I used this wording because my earlier versions of the check were too strict about issue size and caused bounded issues like issue-01, issue-04, and issue-19 to be rejected. The current check focuses on whether there is one coherent, actionable outcome instead of assuming that a short description, multiple files, or technical complexity makes an issue unsuitable.
 
 **Trade-offs**
 
-[What the quoted check gives up. Any one of these is a complete answer: an issue whose
-result it changes, a canary you re-ran with `--only`, a case you accept it will miss, or a
-stated reason nothing changed elsewhere. "Nothing changed, and here is how I know" earns
-the point in full when the reason follows.]
+This check gives up some simplicity because scope cannot be judged only by issue length or a good-first-issue label. I re-ran issue-01, issue-04, issue-05, issue-10, issue-15, issue-19, and issue-20 with --only as canaries. The final version accepted the three bounded issues and continued rejecting the four scope failures, giving 7/7 on that targeted run.
 
 ---
 
 ## Selection rationale
 
-Graded on whether all three are answered, in your own words. Not on how good the
-reasoning is, and not on length — a short honest answer to each earns the full marks.
-This is also the basis for the claim comment you write in Unit 2.
+1. Issue #72 fits my interests because it is a small Python backend bug, which is close to the type of backend work I want more experience with. The estimated 1–2 hour scope also fits the time I have available.
+
+2. The verdict correctly identified that the repository is active, the issue is unclaimed, and the bug has a specific expected behavior and location in the codebase. I also considered that the issue is smaller than the other accepted candidates and is closer to my existing Python/backend experience, which made it a better first contribution for me.
+
+3. I expect claiming it to be fairly straightforward because there is no current assignee or active PR fixing the bug. The main difficulty will be understanding the existing security code and reproducing the malformed-hash behavior before making the fix.
 
 **Selection rationale**
 
