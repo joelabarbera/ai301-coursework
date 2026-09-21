@@ -15,8 +15,7 @@ wrong label is not graded.
 
 **Issue link**
 
-[The individual Path Review issue page. A link to the repository or the issue list
-does not satisfy this field.]
+https://github.com/codepath/pathreview-ai301-fa26-s1/issues/72
 
 **Verdict output**
 
@@ -30,7 +29,39 @@ partial re-run costs about $0.20 — or run the skill on different candidates. O
 recording `reject` for the issue you chose earns no credit for this field.
 
 ```
-paste the output here, including the closing JSON block
+#72 — verify_password raises UnknownHashError instead of returning False
+  - Scope: single root-caused bug (passlib exception escaping in
+    core/security.py), named files, named xfail test to unmark, 1–2h estimate,
+    good first issue+tier-1 labels from a collaborator → pass
+  - Unclaimed: no assignee; the only cross-referenced PR is a different repo's
+    (foojanbabaeeian/ai301-coursework-Fozhan) unrelated coursework PR that
+    merely mentions "issue #72" — it doesn't touch core/security.py and isn't a
+    real linked fix → pass 
+  - Verdict: accept
+
+ [
+    {
+      "item": "https://github.com/codepath/pathreview-ai301-fa26-s1/issues/72",
+      "checks": [
+        {"name": "Maintainer active", "grade": "pass", "evidence":
+  "Default-branch commit on 2026-09-16, 5 days before capture date 
+  2026-09-21."},
+        {"name": "Repo in use", "grade": "pass", "evidence": "Repo not archived;
+  pushedAt 2026-09-16T21:48:27Z, within 90 days."},
+        {"name": "Scope fits", "grade": "pass", "evidence": "Issue names exact 
+  bug (UnknownHashError escaping in core/security.py), expected behavior (return
+  False), files, and the xfail test to unmark; opened by a COLLABORATOR with 
+  good-first-issue/tier-1 labels."},
+        {"name": "Issue unclaimed", "grade": "pass", "evidence": "assignees: [] 
+  and the only cross-referenced PR is an unrelated repo 
+  (foojanbabaeeian/ai301-coursework-Fozhan#1) that only mentions '#72' in its 
+  title, touching no files in core/security.py."},
+        {"name": "Contribution policy allows course workflow", "grade": "pass",
+  "evidence": "docs/CONTRIBUTING.md states no AI restriction; repo's own commits
+  are Claude co-authored."}
+      ],
+      "verdict": "accept"
+    },
 ```
 
 ---
