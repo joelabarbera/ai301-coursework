@@ -15,15 +15,11 @@ label is not graded.
 
 **Pull request**
 
-[Link to the pull request you opened. It must be the pull request's own page on the Path
-Review repo, not your fork's branch page.]
+https://github.com/codepath/pathreview-ai301-fa26-s1/pull/210
 
 **Branch**
 
-[The name of the branch the pull request comes from, exactly as it appears in your fork.
-The naming shape is a type prefix, then the issue number, then a short description. **The
-issue number in the branch name must be the number of the issue the pull request fixes** —
-a name carrying any other number does not satisfy this field.]
+`fix/72-invalid-password-hash`
 
 ## Eval iterations
 
@@ -32,28 +28,38 @@ fields.
 
 **Run history**
 
-[The agreement score of each run you did, in order. A single run is a complete answer if
-only one run occurred. **The last score in your list must match the agreement line in the
-`eval-run.txt` you committed** — that file is the record of your final run.]
+1. Run 1: 20/20. This was the only run. It is the run recorded in `eval-run.txt`:
+
+   > `agreement: 20/20 scored items  (bar: 18/20: PASS)`
+
+   Per-category results from that run:
+
+   > `categories: clear-accept 7/7  not-tested 4/4  silent-drift 4/4  standards-wall 2/2  unreviewable 3/3`
 
 **Package analysis**
 
-[Pick one scored package (`pkg-01` through `pkg-20` — the four `calib-` packages are never
-scored). Name it by id, say what your rubric decided and what the gold label said, and
-explain why your rubric read it that way.]
+Package: **pkg-20** (`ghostty-org/ghostty#13604`, category `standards-wall`).
+My rubric's verdict was `reject`, and the gold label is `reject`. The two agree (`pkg-20  standards-wall  reject  reject   yes`).
+
+On its engineering, pkg-20 is a strong PR. The diff implements the maintainer-authored diagnosis in `src/config/Config.zig` and stays inside the plan. The test evidence shows the repro query moving from `ESC[?997;2n (light)` before the fix to `ESC[?997;1n (dark)` after it, which matches the plan's expected-after. So plan-fidelity, behavior-verified and diff-focused would all pass. The rejection comes from the repo-facts block, which states:
+
+> "contribution policy (CONTRIBUTING.md + AI_POLICY.md): strict AI rules. All AI usage in any form must be disclosed, stating the tool used and the extent of the assistance"
+
+The candidate description contains no AI-use disclosure at all. My `disclosure-policy` check fails whenever "a stated policy applies and the description does not meet it". Because it is a `required` check, the verdict rule ("Reject if any required check is graded `fail` or `unclear`") turns that single failure into a reject. The gold note gives the same reason: "excellent bounded fix ... but the description contains no AI-use disclosure and ghostty's stated policy requires disclosing all AI usage." This package is the reason disclosure is a separate required check and is not folded into general PR quality. Otherwise a technically excellent PR would get through this standards wall.
 
 **Check rationale**
 
-[Quote one check from the `rubric.md` you uploaded to `tools/pr-precheck/`, exactly as it reads now.
-Then say why it reads that way — what you revised to get there, or what you rejected in
-favour of it.]
+From `tools/pr-precheck/rubric.md`:
+
+> | disclosure-policy | The repo's stated AI-use or disclosure policy in the repo-facts block or contribution docs, read against the PR description. | Pass if the repo states no AI-use or disclosure policy, or if the description meets the policy as stated (discloses where disclosure is required; the contribution does not violate a stated prohibition). Fail if a stated policy applies and the description does not meet it. | required |
+
+This check is anchored to the repo's *stated* policy, not to a universal rule that every PR must disclose AI use. Disclosure requirements differ from repo to repo. Ghostty (pkg-20) requires the tool and the extent of assistance, while many repos state nothing. A universal rule would hold clean PRs in repos that never asked for disclosure, and it would fail `clear-accept` packages for something the repo does not require. Grading "the policy as stated" also covers prohibitions as well as disclosure requirements, so a repo that bans AI-generated code is handled by the same row. The check is `required`, not `preferred`, because breaking a repo's stated AI policy gets a PR closed no matter how good the code is. The verdict rule's absent-trigger clause ("A check whose trigger is absent ... grades `pass`, with evidence naming the absence") keeps this check from penalizing repos with no policy.
 
 **Trade-offs**
 
-[Every check gives something up. Any one of these is a complete answer: a package whose
-result it changes, a canary you re-ran with `--only`, a case you accept it will miss, or a
-stated reason nothing changed elsewhere. "Nothing changed, and here is how I know" earns
-the point in full when the reason follows.]
+The check gives up any judgment about AI use where the repo is silent. If a repo has no stated AI policy, a PR that was heavily AI-generated and discloses nothing still passes `disclosure-policy`. I accept that this case will be missed: the rubric grades against the repo's stated asks, not my own norms. It also means the check can only be as accurate as the policy text the package captures. If a repo keeps its AI rules in a file that is not in the repo-facts block, the check will grade `pass` on absence.
+
+Nothing changed elsewhere, and here is how I know. This was the only run, and it scored 20/20. Every other `standards-wall` package and all 7 `clear-accept` packages agreed with gold (`standards-wall 2/2`, `clear-accept 7/7`). So the check did not wrongly hold any accept-labelled package.
 
 ---
 
