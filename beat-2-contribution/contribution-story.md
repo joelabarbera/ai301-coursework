@@ -1,4 +1,4 @@
-# Contribution: [Issue Title]
+# Contribution: Detection gap: instruction to replace the skill with remote content
 
 Path: `beat-2-contribution/contribution-story.md`
 
@@ -8,9 +8,9 @@ format criteria grade exactly that. Your course repo link is the whole submissio
 files and no evidence uploads are part of Assignment 5.
 
 **Contribution Number:** [1]
-**Student:** [Student name]
+**Student:** Joe LaBarbera
 **GitHub Username:** joelabarbera
-**Issue:** [GitHub issue link]
+**Issue:** [SkillShield #35](https://github.com/obielin/skillshield/issues/35)
 **Pull Request:** [GitHub PR link, once opened]
 
 One repository, built across units 5 to 8, telling the whole story of your real
@@ -81,24 +81,31 @@ drafted, what you did with the draft.]
 
 ## Why I Chose This Issue
 
-[1-2 paragraphs in your own words: how you searched, what your scan
-surfaced, what your scout's verdict said, why this issue fits your
-profile, and what you hope to learn. If your scout's verdict on it
-was reject and you chose it anyway, say so here and say why; choosing
-against your own tool silently is what loses points. Close with an
-honest read of the tool itself: where the scout fell short on a real
-wild search and what you changed or would change, or what convinced
-you it held up. **Record the link to your claim comment in this section too.**
-Not claimed yet? Write `claim pending` and today's date where the link goes,
-and add the link the moment your claim lands.]
+I searched GitHub with my issue scout, running three queries built from my fit profile: `good first issue` in Python, `good first issue` in JavaScript, and `help wanted` in Python. The scan returned 283 unique issues. 263 were left after dropping assigned and stale ones, and the scout graded the top five, accepting all of them. Three came from lazypanic999/tunnelscope and two from obielin/skillshield. I then regraded my three favorites (skillshield #35, skillshield #34 and tunnelscope #6) directly against my rubric with fresh evidence. All three passed every required check, and the scout ranked skillshield #35 first. It fits my profile well: a small, bounded Python change to one regex set (`_RUG_PULL_PATTERNS` in `src/skillshield/rules.py`). The issue says exactly what "done" looks like: the `12-rug-pull` red-team test passes, the gap comes off `KNOWN_GAPS`, and there are new true positives plus a near-miss that must not be flagged. The test suite runs in under a second, so it's easy to check my work. I chose it over tunnelscope #6 because that issue has to be tested in PowerShell on Windows and I work on macOS. SkillShield also has a release, 20 stars, merged PRs from outside contributors, a promise of human review, and an AI policy I can follow (use AI tools, but understand every line and run the checks yourself). From this issue I hope to learn how a security scanner's detection rules are written and tested, especially how to catch an attack pattern without flagging harmless text.
+
+The scout held up on the basics but fell short on repository quality. Ranking by fewest comments and then most recently updated put five issues filed within the past hour at the top, and they came from only two repos. tunnelscope passed "Maintainer active" and "Repo in use" even though it is seven days old, has zero stars and no releases, and no issue in it has ever been commented on, because recent commits were all the rubric asked for. Neither repo had a maintainer-response sample to check. I logged this friction in `scan-notes.md`. Next I would cap candidates per repository and set a minimum issue age in the search strategy, and add a rubric check for adoption and outside contributions. I claimed the issue on 2026-10-28: [claim comment](https://github.com/obielin/skillshield/issues/35#issuecomment-6482544239).
 
 **Toolkit**
 
-- Tool: issue-scout (your scout: your search strategy, your rubric),
-  and how you used it
-- What it produced: [the scan and its verdict on this issue, described]
-- Difficulties: [where it fell short, or "none met" if none did]
-- What changed: [what you patched or would update, or "nothing"]
+- Tool: issue-scout (my search strategy and rubric). I used it first in
+  scan mode (three `gh search issues` queries, cheap ranking, top five
+  graded), then in direct mode to regrade skillshield #35, #34 and
+  tunnelscope #6 against live evidence and rank them by fit.
+- What it produced: a scan report (283 found, 263 after filtering, 5
+  graded, 5 accepted) and a direct grading that accepted all three,
+  ranking skillshield #35 first. #35 passed all five required checks,
+  including "Contribution policy: CONTRIBUTING.md: 'You may use AI tools
+  to help write code, tests or descriptions. You are still the
+  author.'"
+- Difficulties: the ranking favored brand-new, zero-comment issues and
+  put only two repos in the top five; the rubric passed a 7-day-old,
+  zero-star repo on commit recency alone; and no maintainer-response
+  history existed to check in either repo.
+- What changed: I logged these in `scan-notes.md` and chose the repo with
+  stronger health signals (outside merged PRs, a release, a written
+  claim process). I would update the strategy to cap results per repo
+  and set a minimum issue age, and add a rubric check for adoption and
+  outside contributions.
 
 ---
 
