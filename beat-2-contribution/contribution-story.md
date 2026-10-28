@@ -9,8 +9,7 @@ files and no evidence uploads are part of Assignment 5.
 
 **Contribution Number:** [1]
 **Student:** [Student name]
-**GitHub Username:** [your GitHub username, exactly as it appears on your profile - no @, no
-profile URL. Your comments upstream are identified by this name.]
+**GitHub Username:** joelabarbera
 **Issue:** [GitHub issue link]
 **Pull Request:** [GitHub PR link, once opened]
 
@@ -55,7 +54,9 @@ happened; these entries are the toolkit's own timeline.
 All four entries are graded. Keep every heading below, and fill each
 one in the week it belongs to.
 
-**Unit 5: [one line on the tool work]**
+**Unit 5: Configuring and Testing My GitHub Issue Scout**
+
+I configured an issue-scout skill with a personal fit profile, three GitHub search queries, and ranking filters to identify beginner-friendly open-source issues. My first scan found 283 unique issues, filtered them to 263 candidates, and accepted all five issues it graded. However, the ranking favored brand-new issues with no comments, and the top five came from only two repositories, including one with little evidence of community adoption. I documented these limitations in my scan notes and proposed improving the ranking with repository diversity and stronger maintainer-activity checks.
 
 [2-4 sentences: what you built (the scout, your strategy), what broke
 or fell short, what changed because of it.]
