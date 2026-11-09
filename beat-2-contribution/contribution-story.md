@@ -66,10 +66,9 @@ I installed the voice guard as a Claude Code hook and added Upstream rules to my
 
 I installed the ship-gate and wrote a manifest of the four checks SkillShield's CONTRIBUTING.md and CI name (pytest, Ruff, Black and the claims-script test), rewritten as `.venv/bin/...` commands after bare `pytest` exited 127 in the gate's fresh shell. My first gate run was a BLOCK on `disclosure-policy`, because my PR draft said Claude Code had run the checks, while CONTRIBUTING.md says "you must have run the checks yourself"; it passed once I ran them myself and fixed the disclosure. That PASS still hid four real problems that only CodeRabbit's review of PR #98 found, because the gate never reads review comments: a quadratic regex, a missed "the skill" target, a wrapped-line bypass and a `SKILL.md.backup` false positive. I fixed them in `86b2ad0`, re-observed every result myself after my voice guard stopped the draft, and the final run on `86b2ad0` passed all 8 required and both preferred pr-precheck checks.
 
-**Unit 8: [one line on the tool work]**
+**Unit 8: Installing the PR monitor, writing my playbook, and drafting my reply to CodeRabbit's third round**
 
-[2-4 sentences: the PR-monitor and your playbook. What it read, what it
-drafted, what you did with the draft.]
+I installed the PR monitor and wrote my playbook. Its staleness threshold comes from measuring @obielin's first response on the last six merged outside PRs (0.2–0.7 days on five, about 2.9 days on #87), so I nudge after 5 quiet days and never tag CodeRabbit. The monitor read PR #98 as FEEDBACK-IN, because CodeRabbit had posted a third review on `86b2ad0` after my ship-gate passed, and once all four playbook sections had rules (its first full run refused without them) it drafted a review response to the three new findings ("the SKILL.md" missed, "the skill settings" flagged, CRLF blank lines crossed). I checked all three findings myself, but I haven't posted the draft or pushed a fourth commit yet, because the draft has placeholder slots and one wrong assumption: files scanned from disk have their CRLF line endings converted to LF when they're read, so only raw `scan_text` input is affected.
 
 ---
 
@@ -475,12 +474,19 @@ The PR has three commits: `257e0e1` (fix), `d105d44` (CHANGELOG) and `86b2ad0` (
   - a wrapped sentence bypassed detection;
   - `SKILL.md.backup` was a false positive.
 - 2026-11-09: I confirmed each finding against the code, fixed all four in `86b2ad0`, added 11 tests (6 of them fail on the previous head), and summarized the fixes in the PR description. I haven't replied to the CodeRabbit threads themselves.
+- 2026-11-09 (21:23 UTC): CodeRabbit posted a third review on `86b2ad0`, with three more findings:
+  - "overwrite the SKILL.md" isn't caught;
+  - "update the skill settings" is flagged;
+  - a CRLF blank line doesn't stop the paragraph gap.
+
+  It also posted a "Title check" suggesting a prefixed title like `fix(rules): …`. I reproduced all three findings on `86b2ad0`. The CRLF one only affects text passed straight to `scan_text`, because `scan_file` reads with `read_text()`, which converts `\r\n` to `\n`. My PR monitor drafted a reply. It's **not posted yet**, and these three findings aren't fixed on the branch.
+- No response yet from a human maintainer on the PR (checked 2026-11-09 16:39 EST).
 
 **Status:** Awaiting review
 
 **Toolkit**
 
-- Tool: the ship-gate (`check_gate.py --branch --title … --body-file pr_draft.md`), which ran my manifest and my pr-precheck. My voice guard's manual check (`check_voice.py --draft`) ran on the draft before each gate run. CodeRabbit's review on the PR came from outside my toolkit.
+- Tool: the ship-gate (`check_gate.py --branch --title … --body-file pr_draft.md`), which ran my manifest and my pr-precheck. After the PR was open, the PR monitor (`monitor.py`, Unit 8) read PR #98's state and drafted my next move from my playbook. My voice guard's manual check (`check_voice.py --draft`) ran on the draft before each gate run. CodeRabbit's review on the PR came from outside my toolkit.
 - What it produced: four ship-gate runs.
   - **15:52, BLOCK** on `disclosure-policy`: the draft said a tool ran the checks.
   - **16:03, PASS** on `d105d44`, after I ran pytest, Ruff and Black myself.
@@ -488,14 +494,19 @@ The PR has three commits: `257e0e1` (fix), `d105d44` (CHANGELOG) and `86b2ad0` (
   - **16:34, PASS** on `86b2ad0`: all 4 manifest checks, plus all 8 required checks (plan-fidelity, description-matches-diff, behavior-verified, repo-checks-run, diff-focused, template-and-asks, disclosure-policy, maintainer-direction) and both preferred checks (commit-messages, title-specific).
 
   The final draft became PR #98's description.
+
+  The PR monitor's `--state` showed PR #98 as MERGEABLE, merge state BLOCKED, no review decision, and FEEDBACK-IN. Its first full run was a REFUSAL, because the playbook was still empty. Its second drafted a review response to CodeRabbit's third round.
 - Difficulties:
   - **The gate passed a flawed branch.** The 16:03 PASS was on a branch with a quadratic regex and a missed issue criterion, because neither the gate nor plan-check reads PR review comments. CodeRabbit found what my own tools didn't.
   - **Its advice didn't fit my case.** The gate's "open the PR within 30 minutes" message doesn't apply when the PR already exists.
   - **Disclosure took several rounds.** Honest disclosure still wasn't enough: CONTRIBUTING.md and my voice guide both wanted me to observe the results myself, not just say who ran them.
+  - **CodeRabbit kept reviewing.** It posted a third round after the gate passed, so a passing gate was out of date within an hour.
+  - **The monitor's draft wasn't ready to post.** It left "measured before" slots empty, because it couldn't run code, and it assumed CRLF reaches the regex unchanged, which isn't true for files scanned from disk.
 - What changed:
   - I read the PR's review threads before updating the description, and fixed the code instead of just documenting the findings.
   - I re-ran every check and comparison myself, so the description reports only results I observed.
   - I would add a pr-precheck check, or a step in my procedure, for open review comments on an existing PR, so a PASS can't hide unaddressed bot or maintainer findings.
+  - I measured the three new findings myself instead of trusting the draft. The draft stays local until I decide whether to fix them in a fourth commit or reply that they're known limits.
 
 ---
 
@@ -503,25 +514,39 @@ The PR has three commits: `257e0e1` (fix), `d105d44` (CHANGELOG) and `86b2ad0` (
 
 **Technical Skills Gained**
 
-[What you learned technically, named concretely.]
+- **How a regex-based detection rule is built and tested.** SG-006 is one alternation of patterns (`_RUG_PULL_PATTERNS`). A change needs true positives worded differently, near-misses that must *not* match, and a red-team corpus (`KNOWN_GAPS`) tied to the docs by a coverage-count test.
+- **Regex performance.** A lazy `[^\n]*?` after a common word is quadratic on repeated input: 7.07s on a 99KB line. Limiting the gap so it stops at the next starting word made it linear (0.016s). I learned to add the 100,000-line speed test the repo's `.coderabbit.yaml` asks for.
+- **Lookaheads for precision:**
+  - `(?!['’]s\b)` for possessives;
+  - `(?![.\-]\w)` for longer filenames like `SKILL.md.backup`;
+  - `pull(?!\s+requests?\b)` so "pull request" isn't read as a download;
+  - a negative noun list, so "the skill list" isn't a target.
+- **Contributing to a stranger's repo:**
+  - working from a fork, with `.git/info/exclude` keeping my notes out of the diff;
+  - a PR template and its checklist (the CHANGELOG line I missed);
+  - first-PR CI that waits for maintainer approval;
+  - an AI policy that requires me to run and understand the checks myself.
 
 **Challenges Overcome**
 
-[What was hard and how you solved it; point at the real events, the
-Toolkit blocks above are full of them.]
+- **The gap I didn't see in the issue.** The issue named only `rules.py` and `test_redteam.py`, but removing the `KNOWN_GAPS` entry made the coverage-count test fail. That's how I found that `docs/threat-coverage.md` had to change too (Understanding the Issue and Solution Approach, Toolkit blocks).
+- **Disclosure, three times.** The ship-gate blocked on `disclosure-policy`, and my own voice guard stopped the PR draft twice. Each time the fix was to run and watch the checks, scans and old-commit comparisons myself, rather than reword who ran them (Pull Request, Toolkit block).
+- **Review findings my tools missed.** CodeRabbit found a quadratic regex and a missed "the skill" target after my ship-gate passed. I measured each finding before changing code. My first rework introduced two regressions of its own, and probing edge cases caught them before I committed (Implementation Notes, 2026-11-09).
 
 **What I'd Do Differently Next Time**
 
-[Reflection on your process.]
+- **Read the repo's PR template, CONTRIBUTING.md AI rules and `.coderabbit.yaml` before building.** All three set requirements I learned about only after the PR was open: the CHANGELOG line, running the checks myself, and a speed test for every new regex.
+- **Try adversarial input on my own pattern before opening the PR.** Repeated keywords, wrapped lines, filename look-alikes and common phrases like "pull request" would have caught most of CodeRabbit's findings.
+- **Post a short update on the issue when I'm late.** I opened the PR five days after my "within a week" estimate and said nothing in the meantime.
+- **Plan and reproduce before I build.** My plan and reproduction were written after the fix, so plan-check confirmed what I had built instead of catching problems early.
 
 ---
 
 ## Resources Used
 
-[What actually helped, not a reading list. List things this story
-already shows you using: the doc you followed to set the environment
-up, the thread that explained the bug, the person who answered you.
-One real entry beats ten plausible ones.]
-
-- [Link to documentation that helped]
-- [Discussion, issue, or post that helped]
+- [SkillShield issue #35](https://github.com/obielin/skillshield/issues/35): its "What done looks like" list and the red-team sample defined the fix. @obielin's reply ("add at least two more true positives worded differently") shaped the tests.
+- [SkillShield CONTRIBUTING.md](https://github.com/obielin/skillshield/blob/main/CONTRIBUTING.md): the quick start I set up from, "Running the checks" (pytest, Ruff, Black), "Adding or changing a detection rule", "Test samples must be safe", and the AI-assisted contributions policy behind my disclosure.
+- [SkillShield PR template](https://github.com/obielin/skillshield/blob/main/.github/PULL_REQUEST_TEMPLATE.md) and [CHANGELOG.md](https://github.com/obielin/skillshield/blob/main/CHANGELOG.md): the template's checklist showed I'd missed the CHANGELOG line, and the existing entries (#87, #64) showed the format.
+- [SkillShield `.github/workflows/ci.yml`](https://github.com/obielin/skillshield/blob/main/.github/workflows/ci.yml) and [`.coderabbit.yaml`](https://github.com/obielin/skillshield/blob/main/.coderabbit.yaml): the exact CI commands for my ship manifest, and the repo's rule to flag quadratic regexes and test 100,000 lines in under a second.
+- [CodeRabbit's reviews on PR #98](https://github.com/obielin/skillshield/pull/98): the four findings fixed in `86b2ad0`, and the three still open.
+- The CodePath AI301 starter materials: [Unit 6](https://github.com/codepath/ai301-unit6-starter) (voice guard, repo memory, scope patch), [Unit 7](https://github.com/codepath/ai301-unit7-starter) (ship-gate) and [Unit 8](https://github.com/codepath/ai301-unit8-starter) (PR monitor). Each one's `skill/INSTALL.md` is what I followed to install and test the tool.
